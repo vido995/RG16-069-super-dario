@@ -5,15 +5,40 @@
 #define TIMER_ID 1
 #define TIMER_INTERVAL 10
 
-static float x_d, y_d; /* Koordinate donjeg desnog ugla Daria */
+static float y_d; /* y-koordinata Daria */
 static float v_yd;/* Komponente vektora brzine skoka Daria*/
 
-static float u_skoku; /* Fleg koji odredjuje da li je Dario vec u skoku*/
+static float u_skoku=0; /* Fleg koji odredjuje da li je Dario vec u skoku*/
+
+static void iscrtajPodlogu(void);
+static void iscrtajDaria(void);
+static void osvetljenje(void);
 
 /* Deklaracija callback funkcija */
 static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_timer(int value);
+static void on_reshape(int width, int height);
+
+
+
+GLfloat ambient_podloga1[] = { 0.5, 0, 0, 1 };
+GLfloat diffuse_podloga1[] = { 0.5, 0.0, 0, 1 };
+
+GLfloat ambient_podloga2[] = { 0.6, 0, 0, 1 };
+GLfloat diffuse_podloga2[] = { 0.6, 0.0, 0, 1 };
+
+GLfloat ambient_noge[] = {1,1,1,1};
+GLfloat diffuse_noge[] = {1,1,1,1};
+
+GLfloat ambient_telo[] = {0,0,1,1};
+GLfloat diffuse_telo[] = {0,0,1,1};
+
+GLfloat ambient_ruke[] = {1,0,0,1};
+GLfloat diffuse_ruke[] = {1,0,0,1};
+
+GLfloat ambient_glava[] = {0.94,0.32,0.1,1};
+GLfloat diffuse_glava[] = {0.94,0.32,0.1,1};
 
 int main(int argc, char **argv){
     
@@ -29,22 +54,33 @@ int main(int argc, char **argv){
     /* Registracija callback funkcija */
     glutDisplayFunc(on_display);
     glutKeyboardFunc(on_keyboard);
+    glutReshapeFunc(on_reshape);
     
     /*Pocetne koordinate Daria*/
-    x_d = 0.05;
-    y_d = -0.7;
+    y_d = -11.75;
     
-    
-    u_skoku = 0;
     
     /* OpenGL inicijalizacija */
     glClearColor(0.75, 0.75, 0.75, 0);
     glEnable(GL_DEPTH_TEST);
     
+    osvetljenje();
+    
     /* Program ulazi u glavnu petlju */
     glutMainLoop();
     
     return 0;
+}
+
+static void on_reshape(int width, int height){
+    
+    /* Postavlja se viewport */
+    glViewport(0, 0, width, height);
+    
+    /* Postavljaju se parametri projekcije */
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, (float) width / height, 1, 100);
 }
 
 static void on_keyboard(unsigned char key, int x, int y){
@@ -59,7 +95,7 @@ static void on_keyboard(unsigned char key, int x, int y){
         case 'w':
         case 'W':
             if(!u_skoku){
-                v_yd=0.01;
+                v_yd=0.1;
                 glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
                 u_skoku = 1;
             }
@@ -75,9 +111,9 @@ static void on_timer(int value){
         y_d += v_yd;
         if(y_d >= 0.2)
             v_yd *= -1;
-        if(y_d <= -0.7){
+        if(y_d <= -11.75){
             u_skoku = 0;
-            y_d = -0.7;
+            y_d = -11.75;
         }
         
         
@@ -89,90 +125,120 @@ static void on_timer(int value){
     }
 }
 
+static void osvetljenje(){
+        
+        /* Ukljucije se osvetljenje */
+        glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 
+	/* Komponente osvetljenja */
+	GLfloat light_ambient[] = {0.1, 0.1, 0.1, 1};
+	GLfloat light_diffuse[] = {1, 1, 1, 1};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+
+	GLfloat shiness = 30;
+	glMaterialf(GL_FRONT, GL_SHININESS, shiness);
+
+	/* Pozicija izvora svetlosti */
+	GLfloat light_position[] = {20, 15, 5, 0};
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+}
+
+static void iscrtajPodlogu(void){
+    
+    /* Iscrtavanje podgloge */
+    for(int i=0;i<12;i++){
+        glColor3f(0.5,0,0);
+        glPushMatrix();
+            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_podloga1);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_podloga1);
+            glTranslatef(i*3.6,0,0);
+            glutSolidCube(1.8);
+            glTranslatef(-1.8,-1.8,0);
+            glutSolidCube(1.8);
+        glPopMatrix();
+
+        glColor3f(0.6,0,0);
+        glPushMatrix();
+            glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_podloga2);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_podloga2);
+            glTranslatef(i*3.6+1.8,0,0);
+            glutSolidCube(1.8);
+            glTranslatef(-1.8,-1.8,0);
+            glutSolidCube(1.8);
+        glPopMatrix();
+    }
+}
+
+static void iscrtajDaria(void){
+
+    /*noge*/
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_noge);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_noge);
+        glColor3f(1,1,1);
+        glScalef(1,1.2,1);
+        glutSolidCube(1);
+    glPopMatrix();
+        
+        /*telo*/
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_telo);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_telo);
+        glColor3f(0,0,1);
+        glTranslatef(0,1.1,0);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    /*ruke*/
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_ruke);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_ruke);
+        glColor3f(1,0,0);
+        glTranslatef(-0.7,1.2,0);
+        glScalef(0.4,0.8,0.5);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glTranslatef(0.7,1.2,0);
+        glScalef(0.4,0.8,0.5);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    /*glava*/
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_glava);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_glava);
+        glColor3f(0.94,0.32,0.1);
+        glTranslatef(0,1.9,0);
+        glutSolidCube(0.6);
+    glPopMatrix();
+    
+}
 static void on_display(void){
     
     /* Brise se prethodni sadrzaj prozora */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    /* Iscrtavanje podgloge */
-    for(int i=0;i<14;i++){
-        glColor3f(0.5,0,0);
-        glBegin(GL_TRIANGLES);
-            glVertex3f(-1+i*0.15,-0.7,0);
-            glVertex3f(-0.85+i*0.15,-0.7,0);
-            glVertex3f(-0.85+i*0.15,-0.85,0);
-        glEnd();
-        glBegin(GL_TRIANGLES);
-            glVertex3f(-1+i*0.15,-0.85,0);
-            glVertex3f(-0.85+i*0.15,-0.85,0);
-            glVertex3f(-0.85+i*0.15,-1,0);
-        glEnd();
-        
-        glColor3f(0.6,0,0);
-        glBegin(GL_TRIANGLES);
-            glVertex3f(-1+i*0.15,-0.7,0);
-            glVertex3f(-0.85+i*0.15,-0.85,0);
-            glVertex3f(-0.85+i*0.15,-85,0);
-        glEnd();
-        glBegin(GL_TRIANGLES);
-            glVertex3f(-1+i*0.15,-0.85,0);
-            glVertex3f(-0.85+i*0.15,-1,0);
-            glVertex3f(-0.85+i*0.15,-1,0);
-        glEnd();
-    }
+    /* Podesava se vidna tacka */
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(0,1,-28,0,0,0,0,1,0);
     
-    /* Iscrtavanje plave pozadine */
-    /*glColor3f(0.12, 0.17, 0.93);*/
-    glColor3f(0.11, 0.56, 1);
-    glBegin(GL_POLYGON);
-        glVertex3f(-1, 1, 0.9);
-        glVertex3f(1, 1, 0.9);
-        glVertex3f(1, -1, 0.9);
-        glVertex3f(-1, -1, 0.9);
-    glEnd();
+    /* Iscrtavanje Daria */
+    glPushMatrix();
+        glTranslatef(0,y_d,0);
+        iscrtajDaria();
+    glPopMatrix();
     
-    /*Iscratanje Daria*/
-    /*noge*/
-    glColor3f(1,1,1);
-    glBegin(GL_POLYGON);
-        glVertex3f(x_d,y_d,0);
-        glVertex3f(x_d,y_d+0.07,0);
-        glVertex3f(x_d-0.05,y_d+0.07,0);
-        glVertex3f(x_d-0.05,y_d,0);
-    glEnd();
-    /*telo*/
-    glColor3f(0,0,1);
-    glBegin(GL_POLYGON);
-        glVertex3f(x_d,y_d+0.07,0);
-        glVertex3f(x_d,y_d+0.13,0);
-        glVertex3f(x_d-0.05,y_d+0.13,0);
-        glVertex3f(x_d-0.05,y_d+0.07,0);
-    glEnd();
-    /*ruke*/
-    glColor3f(1,0,0);
-    glBegin(GL_POLYGON);
-        glVertex3f(x_d-0.05,y_d+0.07,0);
-        glVertex3f(x_d-0.05,y_d+0.13,0);
-        glVertex3f(x_d-0.07,y_d+0.13,0);
-        glVertex3f(x_d-0.07,y_d+0.07,0);
-    glEnd();
-    glBegin(GL_POLYGON);
-        glVertex3f(x_d,y_d+0.07,0);
-        glVertex3f(x_d,y_d+0.13,0);
-        glVertex3f(x_d+0.02,y_d+0.13,0);
-        glVertex3f(x_d+0.02,y_d+0.07,0);
-    glEnd();
-    /*glava*/
-    glColor3f(0.94,0.32,0.1);
-    glBegin(GL_POLYGON);
-        glVertex3f(x_d-0.01,y_d+0.13,0);
-        glVertex3f(x_d-0.01,y_d+0.16,0);
-        glVertex3f(x_d-0.04,y_d+0.16,0);
-        glVertex3f(x_d-0.04,y_d+0.13,0);
-    glEnd();
+    /* Iscrtavanje podloge */
+    glPushMatrix();
+        glTranslatef(-20,-13.25,0);
+        iscrtajPodlogu();
+    glPopMatrix();   
     
-    
-    /* Postavlja se nova slika ne ekran */
+    /* Postavlja se nova slika na ekran */
     glutSwapBuffers();
 }

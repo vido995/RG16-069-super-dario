@@ -5,6 +5,7 @@
 #define TIMER_ID 1
 #define TIMER_INTERVAL 10
 
+
 static float y_d; /* y-koordinata Daria */
 static float v_yd;/* Komponente vektora brzine skoka Daria*/
 
@@ -20,7 +21,7 @@ static void on_keyboard(unsigned char key, int x, int y);
 static void on_timer(int value);
 static void on_reshape(int width, int height);
 
-
+static float brojac=0;
 
 GLfloat ambient_podloga1[] = { 0.5, 0, 0, 1 };
 GLfloat diffuse_podloga1[] = { 0.5, 0.0, 0, 1 };
@@ -39,6 +40,9 @@ GLfloat diffuse_ruke[] = {1,0,0,1};
 
 GLfloat ambient_glava[] = {0.94,0.32,0.1,1};
 GLfloat diffuse_glava[] = {0.94,0.32,0.1,1};
+
+GLfloat ambient_prepreka[] = {0,1,0,1};
+GLfloat diffuse_prepreka[] = {0,1,0,1};
 
 int main(int argc, char **argv){
     
@@ -100,6 +104,12 @@ static void on_keyboard(unsigned char key, int x, int y){
                 u_skoku = 1;
             }
             break;
+            
+        case 'd':
+        case 'D':
+            brojac += 0.1;
+            glutPostRedisplay();
+            break;
     }
 }
 
@@ -148,14 +158,14 @@ static void osvetljenje(){
 static void iscrtajPodlogu(void){
     
     /* Iscrtavanje podgloge */
-    for(int i=0;i<12;i++){
+    for(int i=0;i<100;i++){
         glColor3f(0.5,0,0);
         glPushMatrix();
             glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_podloga1);
             glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_podloga1);
-            glTranslatef(i*3.6,0,0);
+            glTranslatef(i*-3.6,0,0);
             glutSolidCube(1.8);
-            glTranslatef(-1.8,-1.8,0);
+            glTranslatef(1.8,-1.8,0);
             glutSolidCube(1.8);
         glPopMatrix();
 
@@ -163,9 +173,9 @@ static void iscrtajPodlogu(void){
         glPushMatrix();
             glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_podloga2);
             glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_podloga2);
-            glTranslatef(i*3.6+1.8,0,0);
+            glTranslatef(i*-3.6+1.8,0,0);
             glutSolidCube(1.8);
-            glTranslatef(-1.8,-1.8,0);
+            glTranslatef(1.8,-1.8,0);
             glutSolidCube(1.8);
         glPopMatrix();
     }
@@ -217,6 +227,27 @@ static void iscrtajDaria(void){
     glPopMatrix();
     
 }
+
+void iscrtajPrereku(){
+        
+    GLUquadric* quadric = gluNewQuadric();
+    gluQuadricDrawStyle(quadric, GLU_FILL);
+    
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_prepreka);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_prepreka);
+        glColor3f(0,1,0);
+        glRotatef(90,1,0,0);
+        gluCylinder(quadric,1,1,2.8,32,8);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(0,0.4,0); 
+        glRotatef(90,1,0,0);
+        gluCylinder(quadric,1.2,1.2,0.5,32,8);
+        gluDisk(quadric,0,1.2,10,10);
+    glPopMatrix();
+}
+
 static void on_display(void){
     
     /* Brise se prethodni sadrzaj prozora */
@@ -235,10 +266,16 @@ static void on_display(void){
     
     /* Iscrtavanje podloge */
     glPushMatrix();
-        glTranslatef(-20,-13.25,0);
+        glTranslatef(brojac+25,-13.25,0);
         iscrtajPodlogu();
-    glPopMatrix();   
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslatef(brojac-15,-9.15,-0.6);
+        iscrtajPrereku();
+    glPopMatrix();
     
-    /* Postavlja se nova slika na ekran */
+    
+      /* Postavlja se nova slika na ekran */
     glutSwapBuffers();
 }

@@ -1,7 +1,7 @@
 PROGRAM   = SuperDario
 CC        = gcc
 CFLAGS    = -g -Wall
-LDFLAGS   = -lGL -lGLU -lglut
+LDFLAGS   = -lGL -lGLU -lglut -lm
 
 $(PROGRAM): main.o
 	$(CC) -o $(PROGRAM) main.o $(LDFLAGS)
@@ -13,4 +13,3 @@ clean:
 
 dist: clean
 	-tar -chvj -C .. -f ../$(PROGRAM).tar.bz2 $(PROGRAM)
-

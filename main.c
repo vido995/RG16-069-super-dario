@@ -1,13 +1,14 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define TIMER_ID 1
 #define TIMER_INTERVAL 10
 
 
 static float y_d; /* y-koordinata Daria */
-static float v_yd;/* Komponente vektora brzine skoka Daria*/
+static float x_pom; /* x-koordinata skoka Daria */
 
 static float u_skoku=0; /* Fleg koji odredjuje da li je Dario vec u skoku*/
 static float fleg=0; /* Fleg koji oznacava da li treba da padne sa prepreke na pdologu */
@@ -17,6 +18,7 @@ static void iscrtajPodlogu(void);
 static void iscrtajDaria(void);
 static void osvetljenje(void);
 static void iscrtajPrereku(void);
+static void iscrtajZamak(void);
 
 /* Deklaracija callback funkcija */
 static void on_display(void);
@@ -51,6 +53,15 @@ GLfloat diffuse_prepreka[] = {0,1,0,1};
 
 GLfloat ambient_prepreka1[] = {0.96,0.87,0.01,1};
 GLfloat diffuse_prepreka1[] = {0.96,0.87,0.01,1};
+
+GLfloat ambient_o_zamak[] = {0.5,0.5,0.5,1};
+GLfloat diffuse_o_zamak[] = {0.5,0.5,0.5,1};
+
+GLfloat ambient_k_zamak[] = {0.9,0.9,0.9,1};
+GLfloat diffuse_k_zamak[] = {0.9,0.9,0.9,1};
+
+GLfloat ambient_r_zamak[] = {1,0,0,1};
+GLfloat diffuse_r_zamak[] = {1,0,0,1};
 
 int main(int argc, char **argv){
     
@@ -107,7 +118,7 @@ static void on_keyboard(unsigned char key, int x, int y){
         case 'w':
         case 'W':
             if(!u_skoku){
-                v_yd=0.1;
+                x_pom=-sqrt(y_d*(-2*3.52));
                 glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
                 u_skoku = 1;
             }
@@ -116,17 +127,19 @@ static void on_keyboard(unsigned char key, int x, int y){
         case 'd':
         case 'D':
             /* Naredni uslovi sprecavaju da Dario prolazi kroz prepreke */
-            if(brojac >= 13 && brojac <= 15.9 && y_d <= -7.95)
+            if(brojac >= 13 && brojac <= 17 && y_d <= -7.95)
                 break;
-            else if(brojac >= 58 && brojac <= 60.9 && y_d <= -7.95)
+            else if(brojac >= 58 && brojac <= 62 && y_d <= -7.95)
                 break;
-            else if(brojac >= 88 && brojac <= 90.9 && y_d <= -7.95)
+            else if(brojac >= 88 && brojac <= 92 && y_d <= -7.95)
                 break;
-            else if(brojac >= 138 && brojac <= 140.9 && y_d <= -7.95)
+            else if(brojac >= 138 && brojac <= 142 && y_d <= -7.95)
                 break;
-            else if(brojac >= 173 && brojac <= 175.9 && y_d <= -7.95)
+            else if(brojac >= 173 && brojac <= 177 && y_d <= -7.95)
                 break;
-            else if(brojac >= 228 && brojac <= 230.9 && y_d <= -7.95)
+            else if(brojac >= 228 && brojac <= 232 && y_d <= -7.95)
+                break;
+            else if(brojac >= 248 && brojac <= 252 && y_d <= -7.95)
                 break;
             /* slucajevi za lebdece prepreke */
             else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.67 && y_d >= -5.35)
@@ -135,8 +148,54 @@ static void on_keyboard(unsigned char key, int x, int y){
                 break;
             else if(brojac >= 105.05 && brojac <= 110.75 && y_d <= -2.67 && y_d >= -5.35)
                 break;
-            else{
+            else if(brojac >= 148.05 && brojac <= 152.25 && y_d <= -2.67 && y_d >= -5.35)
+                break;
+            else if(brojac >= 194.55 && brojac <= 200.25 && y_d <= -2.65 && y_d >= -5.35)
+                break;
+            else if(brojac >= 257.55 && brojac <= 261.75 && y_d <= -2.65 && y_d >= -5.35)
+                break;
+            else if(brojac >= 264.05 && brojac <= 269.75 && y_d <= -2.65 && y_d >= -5.35)
+                break;
+            else if(brojac<310){
                 brojac += 0.1;
+                glutPostRedisplay();
+                break;
+            }
+            
+        case 'a':
+        case 'A':
+            /* Naredni uslovi sprecavaju da Dario prolazi kroz prepreke */
+            if(brojac >= 13 && brojac <= 17 && y_d <= -7.95)
+                break;
+            else if(brojac >= 58 && brojac <= 62 && y_d <= -7.95)
+                break;
+            else if(brojac >= 88 && brojac <= 92 && y_d <= -7.95)
+                break;
+            else if(brojac >= 138 && brojac <= 142 && y_d <= -7.95)
+                break;
+            else if(brojac >= 173 && brojac <= 177 && y_d <= -7.95)
+                break;
+            else if(brojac >= 228 && brojac <= 232 && y_d <= -7.95)
+                break;
+            else if(brojac >= 248 && brojac <= 252 && y_d <= -7.95)
+                break;
+            /* slucajevi za lebdece prepreke */
+            else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.67 && y_d >= -5.35)
+                break;
+            else if(brojac >= 45.05 && brojac <= 47.75 && y_d <= -2.67 && y_d >= -5.35)
+                break;
+            else if(brojac >= 105.05 && brojac <= 110.75 && y_d <= -2.67 && y_d >= -5.35)
+                break;
+            else if(brojac >= 148.05 && brojac <= 152.25 && y_d <= -2.67 && y_d >= -5.35)
+                break;
+            else if(brojac >= 194.55 && brojac <= 200.25 && y_d <= -2.65 && y_d >= -5.35)
+                break;
+            else if(brojac >= 257.55 && brojac <= 261.75 && y_d <= -2.65 && y_d >= -5.35)
+                break;
+            else if(brojac >= 264.05 && brojac <= 269.75 && y_d <= -2.65 && y_d >= -5.35)
+                break;
+            else if(brojac<310){
+                brojac -= 0.1;
                 glutPostRedisplay();
                 break;
             }
@@ -147,12 +206,12 @@ static void on_timer(int value){
     
     /* Proverava se da li callback dolazi tajmera za skok Daria */
     if(value == TIMER_ID){
+        fleg = 0;
+        /* Implementacija skoka Daria */
+        y_d = (x_pom*x_pom)/(-3.52*2);
+        x_pom+=0.1;
         
-        y_d += v_yd;
-        if(y_d >= 0.2)
-            v_yd *= -1;
-        
-        if(y_d <= -11.75){
+        if(x_pom >= 9.09){
             u_skoku = 0;
             y_d = -11.75;
         }
@@ -165,8 +224,8 @@ static void on_timer(int value){
         }
     }
     /* Slucaj pozivanje funckije on_timer kada Dario pada sa prepreke */
-    if(value == 2){
-        y_d -= v_yd;
+ /*   if(value == 2){
+        y_d -= 0.1;
         
         if(y_d <= -11.75){
             u_skoku = 0;
@@ -179,7 +238,7 @@ static void on_timer(int value){
         if(u_skoku){
             glutTimerFunc(TIMER_INTERVAL, on_timer, 2);
         }
-    }
+    }*/
 }
 
 static void osvetljenje(){
@@ -198,7 +257,7 @@ static void osvetljenje(){
 	glMaterialf(GL_FRONT, GL_SHININESS, shiness);
 
 	/* Pozicija izvora svetlosti */
-	GLfloat light_position[] = {20, 15, 5, 0};
+	GLfloat light_position[] = {0, 0, 5, 1};
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
@@ -270,7 +329,7 @@ static void iscrtajDaria(void){
     
 }
 /* zelena prepreka */
-void iscrtajPrereku(){
+static void iscrtajPrereku(){
         
     GLUquadric* quadric = gluNewQuadric();
     gluQuadricDrawStyle(quadric, GLU_FILL);
@@ -290,13 +349,43 @@ void iscrtajPrereku(){
 }
 
 /* zuta prepreka */
-void iscrtajPrereku2(){
+static void iscrtajPrereku2(){
     
     glPushMatrix();
         glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_prepreka1);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_prepreka1);
         glutSolidCube(1.5);
     glPopMatrix();
+}
+
+static void iscrtajZamak(){
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_o_zamak);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_o_zamak);
+        glutSolidCube(8);
+    glPopMatrix();
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_k_zamak);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_k_zamak);
+        glTranslatef(0,6,0);
+        glScalef(1,2,1); 
+        glutSolidCube(2);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(-3.5,5,0);
+        glScalef(1,2,1);
+        glutSolidCube(1);
+        glTranslatef(7,0,0);
+        glutSolidCube(1);
+    glPopMatrix();
+    glPushMatrix();
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_r_zamak);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_r_zamak);
+        glTranslatef(0,8,0);
+        glRotatef(-90,1,0,0);
+        glutSolidCone(2,3,15,15);
+    glPopMatrix();
+    
 }
 
 static void on_display(void){
@@ -309,34 +398,40 @@ static void on_display(void){
     glLoadIdentity();
     gluLookAt(0,1,-28,0,0,0,0,1,0);
     
+    
     /* Naredni uslovi omogucavaju da se skok zaustavi na podlozi */
-    if(brojac >= 13.1 && brojac <= 16.7 && y_d <= -7.95){
+    if(brojac >= 13.1 && brojac <= 16.7 && y_d <= -7.96){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
         
     }
-    else if(brojac >= 58.1 && brojac <= 61.7 && y_d <= -7.95){
+    else if(brojac >= 58.1 && brojac <= 61.7 && y_d <= -7.96){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 88.1 && brojac <= 91.7 && y_d <= -7.95){
+    else if(brojac >= 88.1 && brojac <= 91.7 && y_d <= -7.96){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 138.1 && brojac <= 141.7 && y_d <= -7.95){
+    else if(brojac >= 138.1 && brojac <= 141.7 && y_d <= -7.96){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 173.1 && brojac <= 176.7 && y_d <= -7.95){
+    else if(brojac >= 173.1 && brojac <= 176.7 && y_d <= -7.96){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     } 
-    else if(brojac >= 228.1 && brojac <= 231.7 && y_d <= -7.95){
+    else if(brojac >= 228.1 && brojac <= 231.7 && y_d <= -7.96){
+        u_skoku = 0;
+        y_d = -7.95;
+        fleg=1;
+    }
+    else if(brojac >= 248.1 && brojac <= 251.7 && y_d <= -7.96){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
@@ -344,24 +439,44 @@ static void on_display(void){
     /* slucajevi za lebdece podloge */
     else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.65 && y_d >= -5.35){
         u_skoku = 0;
-        y_d = -2.65;
+        y_d = -2.64;
         fleg=1;
     }
     else if(brojac >= 45.05 && brojac <= 47.75 && y_d <= -2.65 && y_d >= -5.35){
         u_skoku = 0;
-        y_d = -2.65;
+        y_d = -2.64;
         fleg=1;
     }
     else if(brojac >= 105.05 && brojac <= 110.75 && y_d <= -2.65 && y_d >= -5.35){
         u_skoku = 0;
-        y_d = -2.65;
+        y_d = -2.64;
+        fleg=1;
+    }
+    else if(brojac >= 148.05 && brojac <= 152.25 && y_d <= -2.65 && y_d >= -5.35){
+        u_skoku = 0;
+        y_d = -2.64;
+        fleg=1;
+    }
+    else if(brojac >= 194.55 && brojac <= 200.25 && y_d <= -2.65 && y_d >= -5.35){
+        u_skoku = 0;
+        y_d = -2.64;
+        fleg=1;
+    }
+    else if(brojac >= 257.55 && brojac <= 261.75 && y_d <= -2.65 && y_d >= -5.35){
+        u_skoku = 0;
+        y_d = -2.64;
+        fleg=1;
+    }
+    else if(brojac >= 264.05 && brojac <= 269.75 && y_d <= -2.65 && y_d >= -5.35){
+        u_skoku = 0;
+        y_d = -2.64;
         fleg=1;
     }
     else if(fleg){
-        v_yd = 0.1;
-        glutTimerFunc(TIMER_INTERVAL, on_timer, 2);
+        u_skoku = 1;
+        x_pom=sqrt(y_d*(-2*3.52));
+        glutTimerFunc(TIMER_INTERVAL, on_timer, 1);
     }
-
     /* Iscrtavanje Daria */
     glPushMatrix();
         glTranslatef(0,y_d,0);
@@ -388,6 +503,8 @@ static void on_display(void){
         iscrtajPrereku();
         glTranslatef(-55,0,0);
         iscrtajPrereku();
+        glTranslatef(-20,0,0);
+        iscrtajPrereku();
     glPopMatrix();
     
     /* Iscrtavanje lebdecih prepreka */
@@ -404,7 +521,35 @@ static void on_display(void){
         iscrtajPrereku2();
         glTranslatef(-1.5,0,0);
         iscrtajPrereku2();
+        
+        glTranslatef(-40,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-1.5,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-45,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-1.5,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-1.5,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-60,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-1.5,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-5,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-1.5,0,0);
+        iscrtajPrereku2();
+        glTranslatef(-1.5,0,0);
+        iscrtajPrereku2();
     glPopMatrix();
+    
+    glPushMatrix();
+        glTranslatef(brojac-320,-9,4);
+        glRotatef(30,0,1,0);
+        iscrtajZamak();
+    glPopMatrix();
+    
     
     /* Postavlja se nova slika na ekran */
     glutSwapBuffers();

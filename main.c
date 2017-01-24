@@ -11,7 +11,10 @@ static float y_d; /* y-koordinata Daria */
 static float x_pom; /* x-koordinata skoka Daria */
 
 static float u_skoku=0; /* Fleg koji odredjuje da li je Dario vec u skoku*/
-static float fleg=0; /* Fleg koji oznacava da li treba da padne sa prepreke na pdologu */
+static int fleg=0; /* Fleg koji oznacava da li treba da padne sa prepreke na pdologu */
+static float pomeraj; /* Odredjuje za kolko treba da se poveca skok, u slucaju skoka sa blokova */
+static int fleg1=1; /* Fleg koji sprecava ulazak u uslov */
+
 
 
 static void iscrtajPodlogu(void);
@@ -118,7 +121,8 @@ static void on_keyboard(unsigned char key, int x, int y){
         case 'w':
         case 'W':
             if(!u_skoku){
-                x_pom=-sqrt(y_d*(-2*3.52));
+                pomeraj=11.75+y_d;
+                x_pom=-sqrt(-11.75*(-2*3.52));
                 glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
                 u_skoku = 1;
             }
@@ -127,19 +131,19 @@ static void on_keyboard(unsigned char key, int x, int y){
         case 'd':
         case 'D':
             /* Naredni uslovi sprecavaju da Dario prolazi kroz prepreke */
-            if(brojac >= 13 && brojac <= 17 && y_d <= -7.95)
+            if(brojac >= 13 && brojac <= 16.7 && y_d <= -7.95)
                 break;
-            else if(brojac >= 58 && brojac <= 62 && y_d <= -7.95)
+            else if(brojac >= 58 && brojac <= 61.7 && y_d <= -7.95)
                 break;
-            else if(brojac >= 88 && brojac <= 92 && y_d <= -7.95)
+            else if(brojac >= 88 && brojac <= 91.7 && y_d <= -7.95)
                 break;
-            else if(brojac >= 138 && brojac <= 142 && y_d <= -7.95)
+            else if(brojac >= 138 && brojac <= 141.7 && y_d <= -7.95)
                 break;
-            else if(brojac >= 173 && brojac <= 177 && y_d <= -7.95)
+            else if(brojac >= 173 && brojac <= 176.7 && y_d <= -7.95)
                 break;
-            else if(brojac >= 228 && brojac <= 232 && y_d <= -7.95)
+            else if(brojac >= 228 && brojac <= 231.7 && y_d <= -7.95)
                 break;
-            else if(brojac >= 248 && brojac <= 252 && y_d <= -7.95)
+            else if(brojac >= 248 && brojac <= 251.7 && y_d <= -7.95)
                 break;
             /* slucajevi za lebdece prepreke */
             else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.67 && y_d >= -5.35)
@@ -206,14 +210,17 @@ static void on_timer(int value){
     
     /* Proverava se da li callback dolazi tajmera za skok Daria */
     if(value == TIMER_ID){
+        
         fleg = 0;
+        
         /* Implementacija skoka Daria */
-        y_d = (x_pom*x_pom)/(-3.52*2);
+        y_d = ((x_pom*x_pom)/(-3.52*2))+pomeraj;
         x_pom+=0.1;
         
-        if(x_pom >= 9.09){
+        if(y_d < -11.75){
             u_skoku = 0;
             y_d = -11.75;
+            fleg1=1;
         }
         
         
@@ -400,83 +407,121 @@ static void on_display(void){
     
     
     /* Naredni uslovi omogucavaju da se skok zaustavi na podlozi */
-    if(brojac >= 13.1 && brojac <= 16.7 && y_d <= -7.96){
+    if(brojac >= 13.1 && brojac <= 16.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
         
     }
-    else if(brojac >= 58.1 && brojac <= 61.7 && y_d <= -7.96){
+    else if(brojac >= 58.1 && brojac <= 61.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 88.1 && brojac <= 91.7 && y_d <= -7.96){
+    else if(brojac >= 88.1 && brojac <= 91.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 138.1 && brojac <= 141.7 && y_d <= -7.96){
+    else if(brojac >= 138.1 && brojac <= 141.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 173.1 && brojac <= 176.7 && y_d <= -7.96){
+    else if(brojac >= 173.1 && brojac <= 176.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     } 
-    else if(brojac >= 228.1 && brojac <= 231.7 && y_d <= -7.96){
+    else if(brojac >= 228.1 && brojac <= 231.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
-    else if(brojac >= 248.1 && brojac <= 251.7 && y_d <= -7.96){
+    else if(brojac >= 248.1 && brojac <= 251.7 && y_d <= -7.95){
         u_skoku = 0;
         y_d = -7.95;
         fleg=1;
     }
     /* slucajevi za lebdece podloge */
-    else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.65 && y_d >= -5.35){
+    else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.65 && y_d >= -5){
+        u_skoku = 0;
+        y_d = -2.64;
+        fleg=1;
+       /* printf("Usao u uslov 1\n"); */
+    }
+    else if(brojac >= 45.05 && brojac <= 47.75 && y_d <= -2.64 && y_d >= -5.35){
         u_skoku = 0;
         y_d = -2.64;
         fleg=1;
     }
-    else if(brojac >= 45.05 && brojac <= 47.75 && y_d <= -2.65 && y_d >= -5.35){
+    else if(brojac >= 105.05 && brojac <= 110.75 && y_d <= -2.64 && y_d >= -5.35){
         u_skoku = 0;
         y_d = -2.64;
         fleg=1;
     }
-    else if(brojac >= 105.05 && brojac <= 110.75 && y_d <= -2.65 && y_d >= -5.35){
+    else if(brojac >= 148.05 && brojac <= 152.25 && y_d <= -2.64 && y_d >= -5.35){
         u_skoku = 0;
         y_d = -2.64;
         fleg=1;
     }
-    else if(brojac >= 148.05 && brojac <= 152.25 && y_d <= -2.65 && y_d >= -5.35){
+    else if(brojac >= 194.55 && brojac <= 200.25 && y_d <= -2.64 && y_d >= -5.35){
         u_skoku = 0;
         y_d = -2.64;
         fleg=1;
     }
-    else if(brojac >= 194.55 && brojac <= 200.25 && y_d <= -2.65 && y_d >= -5.35){
+    else if(brojac >= 257.55 && brojac <= 261.75 && y_d <= -2.64 && y_d >= -5.35){
         u_skoku = 0;
         y_d = -2.64;
         fleg=1;
     }
-    else if(brojac >= 257.55 && brojac <= 261.75 && y_d <= -2.65 && y_d >= -5.35){
+    else if(brojac >= 264.05 && brojac <= 269.75 && y_d <= -2.64 && y_d >= -5.35){
         u_skoku = 0;
         y_d = -2.64;
         fleg=1;
     }
-    else if(brojac >= 264.05 && brojac <= 269.75 && y_d <= -2.65 && y_d >= -5.35){
-        u_skoku = 0;
-        y_d = -2.64;
-        fleg=1;
+    
+    /* Uslovi koji omogucavaju da se lik odbija od lebdecih prepreka */
+    else if(brojac >= 28.55 && brojac <= 32.75 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
+       /* printf("Usao u uslov\n");*/
+    }
+    else if(brojac >= 45.05 && brojac <= 47.75 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
+    }
+    else if(brojac >= 105.05 && brojac <= 110.75 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
+    }
+    else if(brojac >= 148.05 && brojac <= 152.25 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
+    }
+    else if(brojac >= 194.55 && brojac <= 200.25 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
+    }
+    else if(brojac >= 257.55 && brojac <= 261.75 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
+    }
+    else if(brojac >= 264.05 && brojac <= 269.75 && y_d <= -2.7 && y_d >= -7 && fleg1){
+        fleg1=0;
+        x_pom*=-1;
     }
     else if(fleg){
+       /* printf("Usao u uslov, brojac je: %f\n", brojac); */
         u_skoku = 1;
+        pomeraj=0;
         x_pom=sqrt(y_d*(-2*3.52));
         glutTimerFunc(TIMER_INTERVAL, on_timer, 1);
     }
+    /*printf("brojac: %f, y_d: %f\n", brojac, y_d);*/
+    
+    
+    
     /* Iscrtavanje Daria */
     glPushMatrix();
         glTranslatef(0,y_d,0);
